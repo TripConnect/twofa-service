@@ -7,8 +7,7 @@ import * as rpcImplementations from './rpc';
 import logger from './utils/logging';
 
 let packageDefinition = protoLoader.loadSync(
-    // require.resolve('common-utils/protos/backend.proto'),
-    "C:/UltimateWolf/common-utils/protos/backend.proto",
+    require.resolve('common-utils/protos/backend.proto'),
     {
         keepCase: true,
         longs: String,
