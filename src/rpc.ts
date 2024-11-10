@@ -1,3 +1,4 @@
+const grpc = require('@grpc/grpc-js');
 import * as OTPAuth from "otpauth";
 
 import TOTPFactor from "./database/models/totp";
@@ -13,18 +14,34 @@ type Validate2FAResponse = {
     status: 'INVALID' | 'VALID';
 }
 
+const ISSUER = process.env.ISSUER || "TripConnect"
+const SECRET_LENGTH = parseInt(process.env.SECRET_LENGTH || "20");
+const MAX_OF_SETTINGS = process.env.MAX_Of_SETTINGS || 1;
+
 export async function createSetting(call: any, callback: any) {
     try {
         let { resourceId, label } = call.request;
-        let secretLength = parseInt(process.env.SECRET_LENGTH || "20");
 
         let totp = new OTPAuth.TOTP({
-            issuer: process.env.ISSUER || "TripConnect",
+            issuer: ISSUER,
             label,
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
-            secret: new OTPAuth.Secret({ size: secretLength }),
+            secret: new OTPAuth.Secret({ size: SECRET_LENGTH }),
+        });
+
+        let settings = await TOTPFactor.findAll({
+            where: { resourceId, enabled: true }
+        });
+
+        if (settings.length >= MAX_OF_SETTINGS) {
+            callback({
+                code: grpc.status.ALREADY_EXISTS,
+                message: 'The resource already registered two-factor authentication'
+            });
+            return;
+        }
+
+        await TOTPFactor.destroy({
+            where: { resourceId, enabled: false }
         });
 
         let setting = await TOTPFactor.create({
@@ -39,7 +56,7 @@ export async function createSetting(call: any, callback: any) {
         };
 
         callback(null, totpSettingResp);
-    } catch (err) {
+    } catch (err: any) {
         logger.error(err);
         callback(err, null);
     }
@@ -61,17 +78,16 @@ export async function validateResource(call: any, callback: any) {
 
     for (let setting of settings) {
         let totp = new OTPAuth.TOTP({
-            issuer: process.env.ISSUER || "TripConnect",
+            issuer: ISSUER,
             label: setting.label,
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
             secret: setting.secret,
         });
         let delta = totp.validate({ token: otp });
         if (delta === 0) {
             validateResp.success = true;
             validateResp.status = "VALID";
+            setting.enabled = true;
+            if (!setting.enabled) await setting.save();
             break;
         }
     }

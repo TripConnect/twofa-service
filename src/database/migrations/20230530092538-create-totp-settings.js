@@ -17,6 +17,11 @@ module.exports = {
           unique: true,
           type: Sequelize.STRING
         },
+        enabled: {
+          defaultValue: false,
+          allowNull: false,
+          type: Sequelize.BOOLEAN
+        },
       },
       {
         timestamps: false // Disable createdAt and updatedAt fields
