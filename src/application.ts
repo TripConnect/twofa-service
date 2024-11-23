@@ -17,7 +17,7 @@ let packageDefinition = protoLoader.loadSync(
     });
 let backendProto = grpc.loadPackageDefinition(packageDefinition).backend;
 
-const PORT = process.env.TWOFA_SERVICE_PORT || 3107;
+const PORT = process.env.TWOFA_SERVICE_PORT || 31074;
 
 function start() {
     let server = new grpc.Server();
