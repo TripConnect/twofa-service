@@ -1,7 +1,9 @@
 const grpc = require('@grpc/grpc-js');
 import * as OTPAuth from "otpauth";
+import kafkajs, { Kafka } from 'kafkajs';
 
 import TOTPFactor from "./database/models/totp";
+import kafkaProducer from './services/kafka/producer';
 import logger from "./utils/logging";
 
 type Generate2FAResponse = {
@@ -55,7 +57,17 @@ export async function createSetting(call: any, callback: any) {
 
         let delta = totp.validate({ token: otp });
         if (delta === 0) {
-            let resp: Create2FAResponse = { resourceId };
+            let setting = await TOTPFactor.create({
+                resourceId,
+                secret,
+            });
+            await kafkaProducer.publish({
+                topic: 'user_updated_for_twofa',
+                message: JSON.stringify({ resourceId: setting.resourceId })
+            });
+            let resp: Create2FAResponse = {
+                resourceId: setting.resourceId
+            };
             callback(null, resp);
         } else {
             callback({
@@ -64,7 +76,10 @@ export async function createSetting(call: any, callback: any) {
             });
         }
     } catch (err: any) {
-        logger.error(err);
+        logger.error("An error occurred:", {
+            message: err.message,
+            stack: err.stack,
+        });
         callback(err, null);
     }
 }
