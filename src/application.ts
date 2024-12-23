@@ -1,21 +1,10 @@
 import 'dotenv/config';
 
 const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
 
+import { backendProto } from 'common-utils';
 import * as rpcImplementations from './rpc';
 import logger from './utils/logging';
-
-let packageDefinition = protoLoader.loadSync(
-    require.resolve('common-utils/protos/backend.proto'),
-    {
-        keepCase: true,
-        longs: String,
-        enums: String,
-        defaults: true,
-        oneofs: true
-    });
-let backendProto = grpc.loadPackageDefinition(packageDefinition).backend;
 
 const PORT = process.env.TWOFA_SERVICE_PORT || 31074;
 
