@@ -10,7 +10,7 @@ const PORT = process.env.TWOFA_SERVICE_PORT || 31074;
 
 function start() {
     let server = new grpc.Server();
-    server.addService(backendProto.twofa_service.TwoFA.service, rpcImplementations);
+    server.addService(backendProto.twofa_service.TwoFactorAuthenticationService.service, rpcImplementations);
     server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (err: any, port: any) => {
         if (err != null) {
             return logger.error(err);
