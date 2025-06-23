@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js');
 import * as OTPAuth from "otpauth";
 import { sendUnaryData, ServerUnaryCall } from "@grpc/grpc-js";
 import { ITwoFactorAuthenticationServiceServer } from "node-proto-lib/protos/twofa_service_grpc_pb";
-import { Create2faRequest, Create2faResponse, Generate2faRequest, Generate2faResponse, Validate2faRequest, Validate2faResponse } from "node-proto-lib/protos/twofa_service_pb";
+import { Create2faRequest, Create2faResponse, Generate2faRequest, Generate2faResponse, Validate2faRequest, Validate2faResponse, ValidationStatus } from "node-proto-lib/protos/twofa_service_pb";
 
 import kafkaProducer from 'services/kafka/producer';
 import logger from "utils/logging";
@@ -90,7 +90,7 @@ export const twofaServiceImp: ITwoFactorAuthenticationServiceServer = {
 
         let validateResp = new Validate2faResponse()
             .setSuccess(false)
-            .setStatus("INVALID");
+            .setStatus(ValidationStatus.INVALID);
 
         for (let setting of settings) {
             let totp = new OTPAuth.TOTP({
@@ -101,7 +101,7 @@ export const twofaServiceImp: ITwoFactorAuthenticationServiceServer = {
             let delta = totp.validate({ token: otp });
             if (delta === 0) {
                 validateResp.setSuccess(true);
-                validateResp.setStatus("VALID");
+                validateResp.setStatus(ValidationStatus.VALID);
                 break;
             }
         }
