@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
-
-import db from './index';
+import db from '.';
 
 const TOTPFactor = db.sequelize.define('totp_factor_settings', {
     resourceId: {

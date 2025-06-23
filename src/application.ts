@@ -1,16 +1,16 @@
+import { ConfigHelper } from 'common-utils';
 import 'dotenv/config';
 
 const grpc = require('@grpc/grpc-js');
+import { TwoFactorAuthenticationServiceService } from "node-proto-lib/protos/twofa_service_grpc_pb";
+import { twofaServiceImp } from 'rpc';
+import logger from 'utils/logging';
 
-import { backendProto } from 'common-utils';
-import * as rpcImplementations from './rpc';
-import logger from './utils/logging';
-
-const PORT = process.env.TWOFA_SERVICE_PORT || 31074;
+const PORT = ConfigHelper.read("server.port");
 
 function start() {
     let server = new grpc.Server();
-    server.addService(backendProto.twofa_service.TwoFactorAuthenticationService.service, rpcImplementations);
+    server.addService(TwoFactorAuthenticationServiceService, twofaServiceImp);
     server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (err: any, port: any) => {
         if (err != null) {
             return logger.error(err);

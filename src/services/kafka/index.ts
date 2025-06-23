@@ -1,9 +1,8 @@
 import { Kafka, logLevel as KafkaLogLevel } from "kafkajs";
-
-const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:9092').split(",")
+import { ConfigHelper } from "common-utils";
 
 export default new Kafka({
     clientId: 'twofa-service',
-    brokers: KAFKA_BROKERS,
+    brokers: [`${ConfigHelper.read("kafka.host")}:${ConfigHelper.read("kafka.port")}`],
     logLevel: KafkaLogLevel.ERROR
 });

@@ -1,11 +1,10 @@
-require('dotenv').config();
+const { ConfigHelper } = require("common-utils");
 
 module.exports = {
-    "development": {
-        "username": process.env.POSTGRES_USERNAME,
-        "password": process.env.POSTGRES_PASSWORD,
-        "database": process.env.POSTGRES_DATABASE,
-        "host": process.env.POSTGRES_ADDRESS,
-        "dialect": "postgres"
-    },
-}
+  "dialect": "postgres",
+  "host": ConfigHelper.read("database.postgres.host"),
+  "username": ConfigHelper.read("database.postgres.username"),
+  "password": ConfigHelper.read("database.postgres.password"),
+  "database": ConfigHelper.read("database.postgres.database"),
+  "logging": false
+};

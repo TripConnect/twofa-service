@@ -1,21 +1,19 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-const configs = require("./../config/config.js");
-const env = process.env.NODE_ENV || 'development';
-const db: { [key: string]: any; } = {};
 
-let activeConfig = configs[env];
+const configs = require("database/config/config");
+import logger from "utils/logging";
 
-let sequelize = new Sequelize(activeConfig.database, activeConfig.username, activeConfig.password, activeConfig);
-db.sequelize = sequelize;
+const db: Record<string, any> = {};
+db.sequelize = new Sequelize(configs.database, configs.username, configs.password, configs);
 
 (async () => {
     try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
+        await db.sequelize.authenticate();
+        logger.info('Connection has been established successfully.');
     } catch (error) {
-        console.log('Unable to connect to the database:', error);
+        logger.error('Unable to connect to the database:', error);
     }
 })();
 
