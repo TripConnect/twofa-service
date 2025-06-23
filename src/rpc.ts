@@ -1,4 +1,4 @@
-const grpc = require('@grpc/grpc-js');
+import * as grpc from '@grpc/grpc-js';
 import * as OTPAuth from "otpauth";
 import { sendUnaryData, ServerUnaryCall } from "@grpc/grpc-js";
 import { ITwoFactorAuthenticationServiceServer } from "node-proto-lib/protos/twofa_service_grpc_pb";
