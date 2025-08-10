@@ -56,7 +56,7 @@ export const twofaServiceImp: ITwoFactorAuthenticationServiceServer = {
                     secret,
                 });
                 await kafkaProducer.publish({
-                    topic: 'user_updated_for_twofa',
+                    topic: ConfigHelper.read('kafka.topic.user-fct-enabled-2fa') as string,
                     message: JSON.stringify({ resourceId: setting.resourceId })
                 });
                 let resp = new Create2faResponse()
