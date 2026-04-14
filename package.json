@@ -29,7 +29,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "docker:build": "docker build -t twofa-service:latest .",
     "docker:run": "docker run --name twofa-service -p 31072:31072 twofa-service:latest",
     "start": "ts-node src/application.ts",
@@ -46,6 +46,7 @@
     "@types/uuid": "^9.0.8",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5"
   }
